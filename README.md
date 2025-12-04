@@ -1,9 +1,43 @@
 # svelte-check-daemon
 
-```
-# Runs `svelte-check --watch` and makes the results available instantly when running `svelte-check-daemon check`.
-svelte-check-daemon start
+Instant `svelte-check` typechecking and diagnostics in [SvelteKit](https://svelte.dev/docs/kit/introduction) projects, by using a daemon that monitors `svelte-check --watch` and returns the latest results when you run `svelte-check-daemon check`.
 
-# Like `svelte-check`, but uses the last valid result from `svelte-check --watch`.
-svelte-check-daemon check
+## Usage
+
+Add `@ampcode/svelte-check-daemon` as a dependency to your project:
+
+```bash
+npm install --save-dev svelte-check-daemon
+# -or-
+pnpm add -D svelte-check-daemon
 ```
+
+Then update your `package.json` scripts to run `svelte-check-daemon start` in the background (usually alongside your dev server) and `svelte-check-daemon check` to get results:
+
+```json
+{
+    "scripts": {
+        "dev": "svelte-check-daemon start --tsconfig tsconfig.json & vite dev",
+        "check": "svelte-check-daemon check"
+    }
+}
+```
+
+If the daemon isn't running, `svelte-check-daemon check` will just run `svelte-check`, which is a fallback in CI or if you've forgotten to run the daemon.
+
+## Commands
+
+| Command                      | Description                                                  |
+| ---------------------------- | ------------------------------------------------------------ |
+| `svelte-check-daemon start`  | Start the daemon (runs `svelte-check --watch` in background) |
+| `svelte-check-daemon check`  | Get the latest results from the daemon                       |
+| `svelte-check-daemon stop`   | Stop the running daemon                                      |
+| `svelte-check-daemon status` | Show daemon status                                           |
+
+## Options
+
+| Option               | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `--workspace <path>` | Path to workspace (default: current directory) |
+| `--tsconfig <path>`  | Path to tsconfig.json                          |
+| `--help`             | Show help message                              |

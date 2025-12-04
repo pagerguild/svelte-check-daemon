@@ -1,0 +1,43 @@
+{
+    "name": "@ampcode/svelte-check-daemon",
+    "publisher": "ampcode",
+    "description": "A daemon for svelte-check that caches results for faster type checking",
+    "version": "0.0.1",
+    "license": "Apache-2.0",
+    "type": "module",
+    "bin": {
+        "svelte-check-daemon": "./bin/svelte-check-daemon.js"
+    },
+    "exports": {
+        ".": {
+            "types": "./dist/src/index.d.ts",
+            "import": "./dist/src/index.js"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ampcode/svelte-check-daemon"
+    },
+    "bugs": {
+        "url": "https://github.com/ampcode/svelte-check-daemon/issues"
+    },
+    "homepage": "https://github.com/ampcode/svelte-check-daemon",
+    "engines": {
+        "node": ">= 18.0.0"
+    },
+    "files": [
+        "bin",
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "prepublishOnly": "pnpm build"
+    },
+    "peerDependencies": {
+        "svelte-check": ">=4.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "typescript": "^5.0.0"
+    }
+}
