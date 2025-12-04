@@ -16,6 +16,7 @@ Then update your `package.json` scripts to run `svelte-check-daemon start` in th
 
 ```json
 {
+    // ...
     "scripts": {
         "dev": "svelte-check-daemon start --tsconfig tsconfig.json & vite dev",
         "check": "svelte-check-daemon check"
