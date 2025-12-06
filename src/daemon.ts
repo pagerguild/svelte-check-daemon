@@ -203,7 +203,7 @@ export class SvelteCheckDaemon {
             });
 
             this.server.listen(this.socketPath, () => {
-                console.log(`Listening on ${this.socketPath}`);
+                if (process.env.VERBOSE) console.log(`Listening on ${this.socketPath}`);
                 resolve();
             });
         });
