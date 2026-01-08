@@ -43,3 +43,11 @@ If the daemon isn't running, `svelte-check-daemon check` will just run `svelte-c
 | `--workspace <path>` | Path to workspace (default: current directory) |
 | `--tsconfig <path>`  | Path to tsconfig.json                          |
 | `--help`             | Show help message                              |
+
+## Environment variables
+
+| Variable                          | Description                                                                                                                                                                                                     |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SVELTE_CHECK_WATCH_BIG_CHANGES`  | Path to a directory (relative to cwd) to watch for deleted files. When a file is deleted in this directory, `svelte-check --watch` is restarted. Useful when `svelte-check --watch` gets out of sync after many file deletions. |
+| `NO_SVELTE_CHECK_DAEMON`          | Set to `1` to disable the daemon (the `start` command will exit immediately, which means checking will always run a full `svelte-check` and not use cached results).                                                                                                                                  |
+| `VERBOSE`                         | Set to enable verbose logging.                                                                                                                                                                                  |

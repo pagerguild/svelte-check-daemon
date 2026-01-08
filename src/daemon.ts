@@ -37,7 +37,9 @@ export class SvelteCheckDaemon {
     private tsconfigPath: string | undefined;
     private routeFileWatcher: fs.FSWatcher | null = null;
     private gitHeadWatcher: fs.FSWatcher | null = null;
+    private bigChangesWatcher: fs.FSWatcher | null = null;
     private syncDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+    private knownFiles: Set<string> = new Set();
 
     constructor(workspacePath: string, tsconfigPath?: string) {
         this.workspacePath = workspacePath;
@@ -54,10 +56,58 @@ export class SvelteCheckDaemon {
         this.startSvelteCheck();
         this.startRouteFileWatcher();
         this.startGitHeadWatcher();
+        this.startBigChangesWatcher();
         await this.startServer();
 
         process.on('SIGINT', () => this.shutdown());
         process.on('SIGTERM', () => this.shutdown());
+    }
+
+    private startBigChangesWatcher(): void {
+        const watchDir = process.env.SVELTE_CHECK_WATCH_BIG_CHANGES;
+        if (!watchDir) {
+            return;
+        }
+
+        const absoluteWatchDir = path.resolve(this.workspacePath, watchDir);
+        if (!fs.existsSync(absoluteWatchDir)) {
+            console.log(`SVELTE_CHECK_WATCH_BIG_CHANGES: directory ${absoluteWatchDir} does not exist, skipping`);
+            return;
+        }
+
+        this.scanDirectory(absoluteWatchDir);
+
+        this.bigChangesWatcher = fs.watch(absoluteWatchDir, { recursive: true }, (eventType, filename) => {
+            if (!filename) return;
+
+            const fullPath = path.join(absoluteWatchDir, filename);
+
+            if (eventType === 'rename') {
+                if (fs.existsSync(fullPath)) {
+                    this.knownFiles.add(fullPath);
+                } else if (this.knownFiles.has(fullPath)) {
+                    this.knownFiles.delete(fullPath);
+                    console.log(`File deleted: ${fullPath}, restarting svelte-check...`);
+                    this.restartSvelteCheck();
+                }
+            }
+        });
+    }
+
+    private scanDirectory(dir: string): void {
+        try {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+                const fullPath = path.join(dir, entry.name);
+                if (entry.isDirectory()) {
+                    this.scanDirectory(fullPath);
+                } else {
+                    this.knownFiles.add(fullPath);
+                }
+            }
+        } catch {
+            // ignore errors (permission denied, etc.)
+        }
     }
 
     private startGitHeadWatcher(): void {
@@ -235,6 +285,9 @@ export class SvelteCheckDaemon {
         }
         if (this.gitHeadWatcher) {
             this.gitHeadWatcher.close();
+        }
+        if (this.bigChangesWatcher) {
+            this.bigChangesWatcher.close();
         }
         if (this.svelteCheckProcess) {
             this.svelteCheckProcess.kill();
