@@ -1,11 +1,11 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { spawnSync } from 'node:child_process';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { getStatusFromDaemon, isDaemonRunning, runSvelteCheckDirectly } from '../dist/src/client.js';
-import { getPidPath, SvelteCheckDaemon } from '../dist/src/daemon.js';
+import { getStatusFromDaemon, isDaemonRunning, runSvelteCheckDirectly } from '../src/client.ts';
+import { getPidPath, SvelteCheckDaemon } from '../src/daemon.ts';
 
 const args = process.argv.slice(2);
 const command = args[0];

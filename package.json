@@ -7,7 +7,7 @@
     "license": "Apache-2.0",
     "type": "module",
     "bin": {
-        "svelte-check-daemon": "./bin/svelte-check-daemon.js"
+        "svelte-check-daemon": "./bin/svelte-check-daemon.ts"
     },
     "exports": {
         ".": {
